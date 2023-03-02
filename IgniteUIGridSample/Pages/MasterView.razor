@@ -5,13 +5,13 @@
 <div class="row-layout master-view-container">
     @if (employees.Count > 0 && countries.Count > 0)
     {
-        <IgbGrid Data="employees" PrimaryKey="EmployeeID" DisplayDensity="DisplayDensity.Cosy" class="ig-typography grid" master-view-scope>
+        <IgbGrid Height="800px" Data="employees" PrimaryKey="EmployeeID" DisplayDensity="DisplayDensity.Cosy" class="ig-typography grid" master-view-scope>
             <IgbColumn Field="EmployeeID" DataType="GridColumnDataType.Number" Header="employeeID"/>
             <IgbColumn Field="FirstName" DataType="GridColumnDataType.String" Header="FirstName" />
             <IgbColumn Field="LastName" DataType="GridColumnDataType.String" Header="LastName" />
 
-            <IgbColumn Header="Country" Editable="true" BodyTemplate="MultiColumnComboBoxTemplate" />
-            <IgbColumn Editable="true" BodyTemplate="DropDownTemplate" />
+            <IgbColumn Header="Country" BodyTemplate="MultiColumnComboBoxTemplate" />
+            <IgbColumn Header="Department" BodyTemplate="DropDownTemplate" />
         </IgbGrid>
     }
 </div>
@@ -19,7 +19,8 @@
 @code {
     private static List<Employee> employees = new List<Employee>();
     private static List<Country> countries = new List<Country>();
-    private static string[] DisplayFields = new string[] { "Name", "Code" };
+    private static string[] displayFields = new string[] { "Name", "Code" };
+    private static List<string> departments = new List<string> { "Engineering", "Marketing", "HR"};
 
     protected override async Task OnInitializedAsync()
     {
@@ -31,7 +32,7 @@
     {
         return
             @<IgbMultiColumnComboBox DataSource="countries"
-                Fields="DisplayFields"
+                Fields="displayFields"
                 TextField="Name"
                 Placeholder="Choose a country"/>;
     };
@@ -40,10 +41,11 @@
     {
         return
             @<IgbDropdown>
-                <IgbButton slot="target">Test</IgbButton>
-                <IgbDropdownItem>test 1</IgbDropdownItem>
-                <IgbDropdownItem>test 2</IgbDropdownItem>
-                <IgbDropdownItem>test 3</IgbDropdownItem>
+            <IgbButton slot="target">Department</IgbButton>
+                @foreach (var department in departments)
+                {
+                    <IgbDropdownItem>@department</IgbDropdownItem>
+                }
             </IgbDropdown>;
     };
 };
