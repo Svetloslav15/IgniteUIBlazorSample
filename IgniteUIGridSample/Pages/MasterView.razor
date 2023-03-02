@@ -1,0 +1,55 @@
+@page "/"
+@inject Northwind.INorthwindService northwindService
+
+<div class="row-layout master-view-container">
+    @if (northwindEmployees.Count > 0)
+    {
+        <IgbMultiColumnComboBox Height="50px" Width="400px"
+                            DataSource="northwindEmployees"
+                            Fields="DisplayFields"
+                            TextField="FirstName"
+                            Placeholder="Choose a employee"
+                            DefaultColumnWidth="200" />
+
+        <IgbGrid Data="northwindEmployees" PrimaryKey="EmployeeID" DisplayDensity="DisplayDensity.Cosy" AllowFiltering="true" FilterMode="FilterMode.ExcelStyleFilter" AutoGenerate="false" class="ig-typography grid" master-view-scope>
+            <IgbColumn Field="EmployeeID" DataType="GridColumnDataType.Number" Header="employeeID" Sortable="true" Selectable="false"></IgbColumn>
+
+            <IgbColumn Editable="true" BodyTemplate="MultiColumnComboBoxTemplate" />
+            <IgbColumn Editable="true" BodyTemplate="DropDownTemplate" />
+
+            <IgbColumn Field="LastName" DataType="GridColumnDataType.String" Header="lastName" Sortable="true" Selectable="false"></IgbColumn>
+        </IgbGrid>
+    }
+</div>
+
+@code {
+    private static List<Northwind.EmployeesType> northwindEmployees = new List<Northwind.EmployeesType>();
+    private static string[] DisplayFields = new string[] { "FirstName", "LastName" };
+
+    protected override async Task OnInitializedAsync()
+    {
+        northwindEmployees = await this.northwindService.GetEmployees() ?? northwindEmployees;
+    }
+
+    public RenderFragment<IgbCellTemplateContext> MultiColumnComboBoxTemplate = (ctx) =>
+        {
+    return
+                    @<IgbMultiColumnComboBox DataSource="northwindEmployees"
+                        Fields="DisplayFields"
+                        Height="50px" Width="400px"
+                        TextField="FirstName"
+                        Placeholder="Choose a employee"
+                        DefaultColumnWidth="200" />;
+            };
+
+    public RenderFragment<IgbCellTemplateContext> DropDownTemplate = (ctx) =>
+    {
+        return
+    @<IgbDropdown>
+        <IgbButton slot="target">Test</IgbButton>
+        <IgbDropdownItem>test 1</IgbDropdownItem>
+        <IgbDropdownItem>test 2</IgbDropdownItem>
+        <IgbDropdownItem>test 3</IgbDropdownItem>
+    </IgbDropdown>;
+    };
+};
