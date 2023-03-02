@@ -9,7 +9,7 @@ builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
-builder.Services.AddScoped<INorthwindService>(sp => new NorthwindService(new HttpClient {BaseAddress = new Uri(builder.HostEnvironment.BaseAddress)}));
+builder.Services.AddScoped<IDataSourceService>(sp => new DataSourceService(new HttpClient {BaseAddress = new Uri(builder.HostEnvironment.BaseAddress)}));
 builder.Services.AddIgniteUIBlazor(
     typeof(IgbMultiColumnComboBoxModule));
 RegisterIgniteUI(builder.Services);

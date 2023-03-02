@@ -1,55 +1,49 @@
 @page "/"
-@inject Northwind.INorthwindService northwindService
+@using IgniteUIGridSample.Models;
+@inject Northwind.IDataSourceService northwindService
 
 <div class="row-layout master-view-container">
-    @if (northwindEmployees.Count > 0)
+    @if (employees.Count > 0 && countries.Count > 0)
     {
-        <IgbMultiColumnComboBox Height="50px" Width="400px"
-                            DataSource="northwindEmployees"
-                            Fields="DisplayFields"
-                            TextField="FirstName"
-                            Placeholder="Choose a employee"
-                            DefaultColumnWidth="200" />
+        <IgbGrid Data="employees" PrimaryKey="EmployeeID" DisplayDensity="DisplayDensity.Cosy" class="ig-typography grid" master-view-scope>
+            <IgbColumn Field="EmployeeID" DataType="GridColumnDataType.Number" Header="employeeID"/>
+            <IgbColumn Field="FirstName" DataType="GridColumnDataType.String" Header="FirstName" />
+            <IgbColumn Field="LastName" DataType="GridColumnDataType.String" Header="LastName" />
 
-        <IgbGrid Data="northwindEmployees" PrimaryKey="EmployeeID" DisplayDensity="DisplayDensity.Cosy" AllowFiltering="true" FilterMode="FilterMode.ExcelStyleFilter" AutoGenerate="false" class="ig-typography grid" master-view-scope>
-            <IgbColumn Field="EmployeeID" DataType="GridColumnDataType.Number" Header="employeeID" Sortable="true" Selectable="false"></IgbColumn>
-
-            <IgbColumn Editable="true" BodyTemplate="MultiColumnComboBoxTemplate" />
+            <IgbColumn Header="Country" Editable="true" BodyTemplate="MultiColumnComboBoxTemplate" />
             <IgbColumn Editable="true" BodyTemplate="DropDownTemplate" />
-
-            <IgbColumn Field="LastName" DataType="GridColumnDataType.String" Header="lastName" Sortable="true" Selectable="false"></IgbColumn>
         </IgbGrid>
     }
 </div>
 
 @code {
-    private static List<Northwind.EmployeesType> northwindEmployees = new List<Northwind.EmployeesType>();
-    private static string[] DisplayFields = new string[] { "FirstName", "LastName" };
+    private static List<Employee> employees = new List<Employee>();
+    private static List<Country> countries = new List<Country>();
+    private static string[] DisplayFields = new string[] { "Name", "Code" };
 
     protected override async Task OnInitializedAsync()
     {
-        northwindEmployees = await this.northwindService.GetEmployees() ?? northwindEmployees;
+        employees = await this.northwindService.GetEmployees() ?? employees;
+        countries = await this.northwindService.GetCountries() ?? countries;
     }
 
     public RenderFragment<IgbCellTemplateContext> MultiColumnComboBoxTemplate = (ctx) =>
-        {
-    return
-                    @<IgbMultiColumnComboBox DataSource="northwindEmployees"
-                        Fields="DisplayFields"
-                        Height="50px" Width="400px"
-                        TextField="FirstName"
-                        Placeholder="Choose a employee"
-                        DefaultColumnWidth="200" />;
-            };
+    {
+        return
+            @<IgbMultiColumnComboBox DataSource="countries"
+                Fields="DisplayFields"
+                TextField="Name"
+                Placeholder="Choose a country"/>;
+    };
 
     public RenderFragment<IgbCellTemplateContext> DropDownTemplate = (ctx) =>
     {
         return
-    @<IgbDropdown>
-        <IgbButton slot="target">Test</IgbButton>
-        <IgbDropdownItem>test 1</IgbDropdownItem>
-        <IgbDropdownItem>test 2</IgbDropdownItem>
-        <IgbDropdownItem>test 3</IgbDropdownItem>
-    </IgbDropdown>;
+            @<IgbDropdown>
+                <IgbButton slot="target">Test</IgbButton>
+                <IgbDropdownItem>test 1</IgbDropdownItem>
+                <IgbDropdownItem>test 2</IgbDropdownItem>
+                <IgbDropdownItem>test 3</IgbDropdownItem>
+            </IgbDropdown>;
     };
 };
