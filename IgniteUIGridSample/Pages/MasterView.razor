@@ -7,22 +7,43 @@
     
     @if (employees.Count > 0 && countries.Count > 0)
     {
-        <IgbGrid Height="800px" Data="employees" PrimaryKey="EmployeeID" DisplayDensity="DisplayDensity.Cosy" class="ig-typography grid" master-view-scope>
-            <IgbColumn HeaderTemplateScript="firstNameHeaderTemplate" Field="EmployeeID" DataType="GridColumnDataType.Number" Header="employeeID"/>
-            <IgbColumn Field="FirstName" DataType="GridColumnDataType.String" Header="FirstName" />
-           
+        <IgbGrid 
+            Height="800px" 
+            Data="employees" 
+            PrimaryKey="EmployeeID" 
+            DisplayDensity="DisplayDensity.Cosy" 
+            class="ig-typography grid" 
+            master-view-scope>
+            <IgbColumn 
+                HeaderTemplateScript="firstNameHeaderTemplate" 
+                Field="EmployeeID" 
+                DataType="GridColumnDataType.Number" 
+                Header="employeeID"/>
+            <IgbColumn 
+                Field="FirstName" 
+                DataType="GridColumnDataType.String" 
+                Header="FirstName" />
             <IgbColumn Header="Country">
                 <BodyTemplate> 
                     <IgbMultiColumnComboBox
-                                        DataSource="countries"
-                                        Fields="displayFields"
-                                        TextField="Name"
-                                        ValueChanged="HandleChange"
-                                        Placeholder="Choose a country" />
+                        DataSource="countries"
+                        Fields="displayFields"
+                        TextField="Name"
+                        ValueChanged="HandleChange"
+                        Placeholder="Choose a country" />
                 </BodyTemplate>
             </IgbColumn>
-            <IgbColumn Field="AvatarUrl" Header="Image" BodyTemplate="ImageCellTemplate" DataType="GridColumnDataType.Image" />
-            <IgbColumn Header="Department" BodyTemplate="DropDownTemplate" />
+            <IgbColumn 
+                Field="AvatarUrl" 
+                Header="Image" 
+                BodyTemplate="ImageCellTemplate" 
+                DataType="GridColumnDataType.Image" />
+            <IgbColumn 
+                Header="Department"
+                BodyTemplate="DropDownTemplate" />
+            <IgbColumn 
+                BodyTemplate="TestTemplate" 
+                Header="PopulatedValue"/>
         </IgbGrid>
     }
 </div>
@@ -32,6 +53,7 @@
     private static List<Country> countries = new List<Country>();
     private static string[] displayFields = new string[] { "Name", "Code" };
     private static List<string> departments = new List<string> { "Engineering", "Marketing", "HR"};
+    private static string selectedValue = "";
 
     protected override async Task OnInitializedAsync()
     {
@@ -41,8 +63,14 @@
 
     public void HandleChange(object val)
     {
-        
+        selectedValue = val.ToString();
+        StateHasChanged();
     }
+
+    public RenderFragment<IgbCellTemplateContext> TestTemplate = (ctx) =>
+    {
+        return @<span>@selectedValue</span>;
+     };
 
     public RenderFragment<IgbCellTemplateContext> ImageCellTemplate = (ctx) =>
     {
@@ -58,7 +86,7 @@
                 <IgbButton slot="target">@value</IgbButton>
                 @foreach (var department in departments)
                 {
-                    <IgbDropdownItem >@department</IgbDropdownItem>
+                    <IgbDropdownItem>@department</IgbDropdownItem>
                 }
             </IgbDropdown>;
     };
