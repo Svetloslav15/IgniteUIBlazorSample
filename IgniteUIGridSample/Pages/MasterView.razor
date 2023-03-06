@@ -1,7 +1,6 @@
 @page "/"
 @using IgniteUIGridSample.Models;
-@inject Northwind.IDataSourceService northwindService
-@inject IJSRuntime JS
+@inject Northwind.IDataSourceService dataSourceService
 
 <div class="row-layout master-view-container">
     
@@ -62,9 +61,9 @@
 
     protected override async Task OnInitializedAsync()
     {
-        employees = await this.northwindService.GetEmployees() ?? employees;
-        countries = await this.northwindService.GetCountries() ?? countries;
-        states = await this.northwindService.GetStates() ?? states;
+        employees = await this.dataSourceService.GetEmployees() ?? employees;
+        countries = await this.dataSourceService.GetCountries() ?? countries;
+        states = await this.dataSourceService.GetStates() ?? states;
     }
 
     public void HandleSelectState(object val)
