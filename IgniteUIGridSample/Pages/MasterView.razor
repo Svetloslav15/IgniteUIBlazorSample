@@ -23,27 +23,32 @@
                 Field="FirstName" 
                 DataType="GridColumnDataType.String" 
                 Header="FirstName" />
+            <IgbColumn Field="AvatarUrl"
+                   Header="Avatar"
+                   BodyTemplate="ImageCellTemplate"
+                   DataType="GridColumnDataType.Image" />
             <IgbColumn Header="Country">
-                <BodyTemplate> 
-                    <IgbMultiColumnComboBox
+                <BodyTemplate>
+                    <IgbMultiColumnComboBox 
                         DataSource="countries"
                         Fields="displayFields"
                         TextField="Name"
-                        ValueChanged="HandleChange"
                         Placeholder="Choose a country" />
                 </BodyTemplate>
             </IgbColumn>
-            <IgbColumn 
-                Field="AvatarUrl" 
-                Header="Image" 
-                BodyTemplate="ImageCellTemplate" 
-                DataType="GridColumnDataType.Image" />
-            <IgbColumn 
-                Header="Department"
-                BodyTemplate="DropDownTemplate" />
-            <IgbColumn 
-                BodyTemplate="TestTemplate" 
-                Header="PopulatedValue"/>
+            <IgbColumn Header="State">
+                <BodyTemplate> 
+                    <IgbMultiColumnComboBox
+                        DataSource="states"
+                        Fields="displayFields"
+                        TextField="Name"
+                        ValueChanged="HandleSelectState"
+                        Placeholder="Choose a state" />
+                </BodyTemplate>
+            </IgbColumn>
+            <IgbColumn
+                Header="City"
+                BodyTemplate="CitiesTemplate" />
         </IgbGrid>
     }
 </div>
@@ -51,42 +56,60 @@
 @code {
     private static List<Employee> employees = new List<Employee>();
     private static List<Country> countries = new List<Country>();
+    private static List<State> states = new List<State>();
     private static string[] displayFields = new string[] { "Name", "Code" };
     private static List<string> departments = new List<string> { "Engineering", "Marketing", "HR"};
-    private static string selectedValue = "";
+    private static string selectedState = "";
 
     protected override async Task OnInitializedAsync()
     {
         employees = await this.northwindService.GetEmployees() ?? employees;
         countries = await this.northwindService.GetCountries() ?? countries;
+        states = await this.northwindService.GetStates() ?? states;
     }
 
-    public void HandleChange(object val)
+    public void HandleSelectState(object val)
     {
-        selectedValue = val.ToString();
-        StateHasChanged();
+        selectedState = val.ToString();
     }
 
     public RenderFragment<IgbCellTemplateContext> TestTemplate = (ctx) =>
     {
-        return @<span>@selectedValue</span>;
-     };
+    return @<span>@selectedState</span>;
+        };
 
     public RenderFragment<IgbCellTemplateContext> ImageCellTemplate = (ctx) =>
     {
         return @<img src=@ctx.Cell.Value style="width: 36%;" />;
     };
 
-    public RenderFragment<IgbCellTemplateContext> DropDownTemplate = (ctx) =>
+    public RenderFragment<IgbCellTemplateContext> StateTemplate = (ctx) =>
     {
-        var value = ctx.Cell.Value != null ? ctx.Cell.Value : "Department";
+        var value = ctx.Cell.Value != null ? ctx.Cell.Value : "State";
 
         return
-            @<IgbDropdown Select=>
+            @<IgbDropdown>
                 <IgbButton slot="target">@value</IgbButton>
-                @foreach (var department in departments)
+                @foreach (var state in states)
                 {
-                    <IgbDropdownItem>@department</IgbDropdownItem>
+                    <IgbDropdownItem>@state.Name</IgbDropdownItem>
+                }
+            </IgbDropdown>;
+    };
+
+    public RenderFragment<IgbCellTemplateContext> CitiesTemplate = (ctx) =>
+    {
+        var state = states.FirstOrDefault(state => state.Name == selectedState);
+
+        return
+            @<IgbDropdown>
+                <IgbButton slot="target">Cities</IgbButton>
+                @if (state != null)
+                {
+                    @foreach (var city in state.Cities)
+                    {
+                        <IgbDropdownItem>@city</IgbDropdownItem>
+                    }
                 }
             </IgbDropdown>;
     };

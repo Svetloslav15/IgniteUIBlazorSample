@@ -20,9 +20,12 @@ namespace IgniteUIGridSample.Northwind
 
         public async Task<List<Country>?> GetCountries()
         {
-            var data = await this._http.GetFromJsonAsync<List<Country>>("/static-data/countries.json");
+            return await this._http.GetFromJsonAsync<List<Country>>("/static-data/countries.json");
+        }
 
-            return data;
+        public async Task<List<State>?> GetStates()
+        {
+            return await this._http.GetFromJsonAsync<List<State>>("/static-data/states-with-cities.json");
         }
     }
 }

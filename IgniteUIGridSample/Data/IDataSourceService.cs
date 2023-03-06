@@ -7,5 +7,7 @@ namespace IgniteUIGridSample.Northwind
         Task<List<Employee>?> GetEmployees();
 
         Task<List<Country>?> GetCountries();
+
+        Task<List<State>?> GetStates();
     }
 }
