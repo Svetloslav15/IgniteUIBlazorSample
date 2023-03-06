@@ -27,28 +27,27 @@
                    Header="Avatar"
                    BodyTemplate="ImageCellTemplate"
                    DataType="GridColumnDataType.Image" />
-            <IgbColumn Header="Country">
-                <BodyTemplate>
-                    <IgbMultiColumnComboBox 
-                        DataSource="countries"
-                        Fields="displayFields"
-                        TextField="Name"
-                        Placeholder="Choose a country" />
-                </BodyTemplate>
-            </IgbColumn>
+            <IgbColumn Header="Country" BodyTemplate="CountriesTemplate" />
             <IgbColumn Header="State">
                 <BodyTemplate> 
                     <IgbMultiColumnComboBox
                         DataSource="states"
+                        ValueChanged="HandleSelectState"
                         Fields="displayFields"
                         TextField="Name"
-                        ValueChanged="HandleSelectState"
                         Placeholder="Choose a state" />
                 </BodyTemplate>
             </IgbColumn>
+            
             <IgbColumn
-                Header="City"
-                BodyTemplate="CitiesTemplate" />
+                Header="City">
+                <BodyTemplate>
+                    <IgbMultiColumnComboBox DataSource="cities"
+                        Fields="displayFields"
+                        TextField="Name"
+                        Placeholder="Choose a city" />
+                </BodyTemplate>
+                </IgbColumn>
         </IgbGrid>
     }
 </div>
@@ -57,9 +56,9 @@
     private static List<Employee> employees = new List<Employee>();
     private static List<Country> countries = new List<Country>();
     private static List<State> states = new List<State>();
-    private static string[] displayFields = new string[] { "Name", "Code" };
-    private static List<string> departments = new List<string> { "Engineering", "Marketing", "HR"};
+    private static string[] displayFields = new string[] { "Name" };
     private static string selectedState = "";
+    private static List<City> cities = new List<City>();
 
     protected override async Task OnInitializedAsync()
     {
@@ -71,6 +70,10 @@
     public void HandleSelectState(object val)
     {
         selectedState = val.ToString();
+        cities = states.FirstOrDefault(state => state.Name == selectedState).Cities
+                       .Select(c => new City(){Name = c})
+                       .ToList();
+    
     }
 
     public RenderFragment<IgbCellTemplateContext> TestTemplate = (ctx) =>
@@ -97,19 +100,14 @@
             </IgbDropdown>;
     };
 
-    public RenderFragment<IgbCellTemplateContext> CitiesTemplate = (ctx) =>
+    public RenderFragment<IgbCellTemplateContext> CountriesTemplate = (ctx) =>
     {
-        var state = states.FirstOrDefault(state => state.Name == selectedState);
-
         return
             @<IgbDropdown>
-                <IgbButton slot="target">Cities</IgbButton>
-                @if (state != null)
+                <IgbButton slot="target">Country</IgbButton>
+                @foreach (var country in countries)
                 {
-                    @foreach (var city in state.Cities)
-                    {
-                        <IgbDropdownItem>@city</IgbDropdownItem>
-                    }
+                    <IgbDropdownItem>@country.Name</IgbDropdownItem>
                 }
             </IgbDropdown>;
     };
