@@ -1,16 +1,27 @@
 @page "/"
 @using IgniteUIGridSample.Models;
 @inject Northwind.IDataSourceService northwindService
+@inject IJSRuntime JS
 
 <div class="row-layout master-view-container">
+    
     @if (employees.Count > 0 && countries.Count > 0)
     {
         <IgbGrid Height="800px" Data="employees" PrimaryKey="EmployeeID" DisplayDensity="DisplayDensity.Cosy" class="ig-typography grid" master-view-scope>
-            <IgbColumn Field="EmployeeID" DataType="GridColumnDataType.Number" Header="employeeID"/>
+            <IgbColumn HeaderTemplateScript="firstNameHeaderTemplate" Field="EmployeeID" DataType="GridColumnDataType.Number" Header="employeeID"/>
             <IgbColumn Field="FirstName" DataType="GridColumnDataType.String" Header="FirstName" />
-            <IgbColumn Field="LastName" DataType="GridColumnDataType.String" Header="LastName" />
-
-            <IgbColumn Header="Country" BodyTemplate="MultiColumnComboBoxTemplate" />
+           
+            <IgbColumn Header="Country">
+                <BodyTemplate> 
+                    <IgbMultiColumnComboBox
+                                        DataSource="countries"
+                                        Fields="displayFields"
+                                        TextField="Name"
+                                        ValueChanged="HandleChange"
+                                        Placeholder="Choose a country" />
+                </BodyTemplate>
+            </IgbColumn>
+            <IgbColumn Field="AvatarUrl" Header="Image" BodyTemplate="ImageCellTemplate" DataType="GridColumnDataType.Image" />
             <IgbColumn Header="Department" BodyTemplate="DropDownTemplate" />
         </IgbGrid>
     }
@@ -28,23 +39,26 @@
         countries = await this.northwindService.GetCountries() ?? countries;
     }
 
-    public RenderFragment<IgbCellTemplateContext> MultiColumnComboBoxTemplate = (ctx) =>
+    public void HandleChange(object val)
     {
-        return
-            @<IgbMultiColumnComboBox DataSource="countries"
-                Fields="displayFields"
-                TextField="Name"
-                Placeholder="Choose a country"/>;
+        
+    }
+
+    public RenderFragment<IgbCellTemplateContext> ImageCellTemplate = (ctx) =>
+    {
+        return @<img src=@ctx.Cell.Value style="width: 36%;" />;
     };
 
     public RenderFragment<IgbCellTemplateContext> DropDownTemplate = (ctx) =>
     {
+        var value = ctx.Cell.Value != null ? ctx.Cell.Value : "Department";
+
         return
-            @<IgbDropdown>
-            <IgbButton slot="target">Department</IgbButton>
+            @<IgbDropdown Select=>
+                <IgbButton slot="target">@value</IgbButton>
                 @foreach (var department in departments)
                 {
-                    <IgbDropdownItem>@department</IgbDropdownItem>
+                    <IgbDropdownItem >@department</IgbDropdownItem>
                 }
             </IgbDropdown>;
     };
